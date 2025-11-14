@@ -1,0 +1,124 @@
+<!-- 
+    ARQUIVO: users.html
+    DESCRIÇÃO: Página de gerenciamento de usuários (Admin only)
+    
+    Exibe:
+    - Tabela com lista de todos os usuários
+    - Ações: ver permissões, ativar/desativar usuário
+    - Botão para criar novo usuário
+    - Legenda de status
+-->
+
+{% extends "base.html" %}
+
+{% block title %}Gerenciar Usuários - Sistema de Logs{% endblock %}
+
+{% block content %}
+<!-- Cabeçalho com título e botão de novo usuário -->
+<div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+    <h1 class="h2"><i class="bi bi-people"></i> Gerenciar Usuários</h1>
+    <div class="btn-toolbar mb-2 mb-md-0">
+        <a href="{{ url_for('users.add_user') }}" class="btn btn-success">
+            <i class="bi bi-person-plus"></i> Novo Usuário
+        </a>
+    </div>
+</div>
+
+<div class="card shadow">
+    <div class="card-header bg-light">
+        <h6 class="m-0 font-weight-bold text-primary">Lista de Usuários do Sistema</h6>
+    </div>
+    <div class="card-body">
+        <div class="table-responsive">
+            <table class="table table-hover" id="usersTable">
+                <thead class="table-light">
+                    <tr>
+                        <th>ID</th>
+                        <th>Usuário</th>
+                        <th>Email</th>
+                        <th>Tipo</th>
+                        <th>Status</th>
+                        <th>Data Criação</th>
+                        <th>Ações</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for user in users %}
+                    <tr>
+                        <td>{{ user.id }}</td>
+                        <td>
+                            <strong>{{ user.username }}</strong>
+                            {% if user.id == current_user.id %}
+                            <span class="badge bg-info">Você</span>
+                            {% endif %}
+                        </td>
+                        <td>{{ user.email }}</td>
+                        <td>
+                            <span class="badge {% if user.role.value == 'admin' %}bg-warning{% else %}bg-secondary{% endif %}">
+                                {{ user.role.value|title }}
+                            </span>
+                        </td>
+                        <td>
+                            {% if user.is_active %}
+                            <span class="badge bg-success">Ativo</span>
+                            {% else %}
+                            <span class="badge bg-danger">Inativo</span>
+                            {% endif %}
+                        </td>
+                        <td>{{ user.created_at.strftime('%d/%m/%Y') }}</td>
+                        <td>
+                            <div class="btn-group btn-group-sm">
+                                <a href="{{ url_for('users.user_permissions', user_id=user.id) }}" 
+                                   class="btn btn-outline-primary" title="Permissões">
+                                    <i class="bi bi-shield-check"></i>
+                                </a>
+                                {% if user.id != current_user.id %}
+                                <form method="POST" action="{{ url_for('users.toggle_user', user_id=user.id) }}" class="d-inline">
+                                    <button type="submit" class="btn btn-outline-{% if user.is_active %}warning{% else %}success{% endif %}" 
+                                            title="{% if user.is_active %}Desativar{% else %}Ativar{% endif %}">
+                                        <i class="bi bi-{% if user.is_active %}person-x{% else %}person-check{% endif %}"></i>
+                                    </button>
+                                </form>
+                                {% endif %}
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<div class="row mt-4">
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header">
+                <h6 class="mb-0"><i class="bi bi-info-circle"></i> Legenda de Status</h6>
+            </div>
+            <div class="card-body">
+                <span class="badge bg-success">Ativo</span> - Usuário pode acessar o sistema<br>
+                <span class="badge bg-danger">Inativo</span> - Usuário bloqueado<br>
+                <span class="badge bg-warning">Admin</span> - Permissões administrativas<br>
+                <span class="badge bg-secondary">User</span> - Permissões limitadas
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    // Confirmação para desativar/ativar usuário
+    document.addEventListener('DOMContentLoaded', function() {
+        const forms = document.querySelectorAll('form');
+        forms.forEach(form => {
+            form.addEventListener('submit', function(e) {
+                if (!confirm('Tem certeza que deseja alterar o status deste usuário?')) {
+                    e.preventDefault();
+                }
+            });
+        });
+    });
+</script>
+{% endblock %}

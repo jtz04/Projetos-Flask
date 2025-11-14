@@ -1,0 +1,131 @@
+<!-- 
+    ARQUIVO: alerts.html
+    DESCRIÇÃO: Página de alertas de segurança (Admin only)
+    
+    Exibe:
+    - Cards com alertas de segurança
+    - Filtro para mostrar/ocultar alertas resolvidos
+    - Ações para resolver alertas
+    - Link para ver logs associados
+    - Legenda de níveis de severidade
+-->
+
+{% extends "base.html" %}
+
+{% block title %}Alertas de Segurança - Sistema de Logs{% endblock %}
+
+{% block content %}
+<!-- Cabeçalho com título e botão de filtro -->
+<div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+    <h1 class="h2"><i class="bi bi-exclamation-triangle"></i> Alertas de Segurança</h1>
+    <div class="btn-toolbar mb-2 mb-md-0">
+        <div class="btn-group me-2">
+            <!-- Botão para incluir alertas já resolvidos -->
+            <a href="?show_resolved=true" class="btn btn-sm btn-outline-secondary">Incluir Resolvidos</a>
+        </div>
+    </div>
+</div>
+
+<!-- Grid de alertas em cards -->
+<div class="row">
+    {% for alert in alerts %}
+    <div class="col-12 mb-3">
+        <div class="card border-{% if alert.alert_level.value == 'high' %}danger{% elif alert.alert_level.value == 'medium' %}warning{% else %}info{% endif %} shadow">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h6 class="m-0 font-weight-bold text-{% if alert.alert_level.value == 'high' %}danger{% elif alert.alert_level.value == 'medium' %}warning{% else %}info{% endif %}">
+                    {{ alert.title }}
+                </h6>
+                <div>
+                    <span class="badge bg-{% if alert.alert_level.value == 'high' %}danger{% elif alert.alert_level.value == 'medium' %}warning{% else %}info{% endif %}">
+                        {{ alert.alert_level.value|upper }}
+                    </span>
+                    {% if alert.is_resolved %}
+                    <span class="badge bg-success">Resolvido</span>
+                    {% else %}
+                    <span class="badge bg-warning">Pendente</span>
+                    {% endif %}
+                </div>
+            </div>
+            <div class="card-body">
+                <p class="card-text">{{ alert.description }}</p>
+                <div class="row text-muted small">
+                    <div class="col-md-6">
+                        <i class="bi bi-clock"></i> Criado em: {{ alert.created_at.strftime('%d/%m/%Y %H:%M') }}
+                    </div>
+                    {% if alert.is_resolved %}
+                    <div class="col-md-6">
+                        <i class="bi bi-check-circle"></i> Resolvido em: {{ alert.resolved_at.strftime('%d/%m/%Y %H:%M') }}
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+            <div class="card-footer">
+                {% if not alert.is_resolved %}
+                <form method="POST" action="{{ url_for('alerts.resolve_alert', alert_id=alert.id) }}" class="d-inline">
+                    <button type="submit" class="btn btn-success btn-sm">
+                        <i class="bi bi-check-circle"></i> Marcar como Resolvido
+                    </button>
+                </form>
+                {% endif %}
+                
+                {% if alert.log %}
+                <a href="{{ url_for('logs.logs') }}?search={{ alert.log.id }}" class="btn btn-outline-primary btn-sm">
+                    <i class="bi bi-search"></i> Ver Log Associado
+                </a>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+
+{% if not alerts %}
+<div class="text-center py-5">
+    <i class="bi bi-shield-check display-1 text-success"></i>
+    <h3 class="text-success">Nenhum Alerta Ativo</h3>
+    <p class="text-muted">O sistema está funcionando normalmente sem alertas de segurança.</p>
+</div>
+{% endif %}
+
+<div class="row mt-4">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <h6 class="mb-0"><i class="bi bi-info-circle"></i> Níveis de Alerta</h6>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-4">
+                        <span class="badge bg-danger">ALTA</span>
+                        <p class="mb-0">Ameaças críticas que requerem ação imediata</p>
+                    </div>
+                    <div class="col-md-4">
+                        <span class="badge bg-warning">MÉDIA</span>
+                        <p class="mb-0">Atividades suspeitas que merecem atenção</p>
+                    </div>
+                    <div class="col-md-4">
+                        <span class="badge bg-info">BAIXA</span>
+                        <p class="mb-0">Informações e alertas de rotina</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    // Confirmação para resolver alerta
+    document.addEventListener('DOMContentLoaded', function() {
+        const forms = document.querySelectorAll('form');
+        forms.forEach(form => {
+            form.addEventListener('submit', function(e) {
+                if (!confirm('Tem certeza que deseja marcar este alerta como resolvido?')) {
+                    e.preventDefault();
+                }
+            });
+        });
+    });
+</script>
+{% endblock %}

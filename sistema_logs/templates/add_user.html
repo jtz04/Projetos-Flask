@@ -1,0 +1,110 @@
+<!-- 
+    ARQUIVO: add_user.html
+    DESCRIÇÃO: Formulário para criar novo usuário (Admin only)
+    
+    Permite:
+    - Definir nome de usuário e email
+    - Definir senha
+    - Marcar como administrador (opcional)
+    - Validação de senhas coincidentes
+-->
+
+{% extends "base.html" %}
+
+{% block title %}Adicionar Usuário - Sistema de Logs{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="card shadow">
+            <div class="card-header bg-primary text-white">
+                <h5 class="mb-0"><i class="bi bi-person-plus"></i> Adicionar Novo Usuário</h5>
+            </div>
+            <div class="card-body">
+                <form method="POST" action="{{ url_for('users.add_user') }}">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="username" class="form-label">Nome de Usuário *</label>
+                                <input type="text" class="form-control" id="username" name="username" required>
+                                <div class="form-text">Nome único para identificação no sistema.</div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="email" class="form-label">Email *</label>
+                                <input type="email" class="form-control" id="email" name="email" required>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="password" class="form-label">Senha *</label>
+                                <input type="password" class="form-control" id="password" name="password" required>
+                                <div class="form-text">Mínimo 6 caracteres.</div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="confirm_password" class="form-label">Confirmar Senha *</label>
+                                <input type="password" class="form-control" id="confirm_password" name="confirm_password" required>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <div class="form-check form-switch">
+                            <input class="form-check-input" type="checkbox" id="is_admin" name="is_admin">
+                            <label class="form-check-label" for="is_admin">
+                                <strong>Usuário Administrador</strong>
+                            </label>
+                        </div>
+                        <div class="form-text">
+                            Usuários administradores têm acesso completo ao sistema, incluindo gestão de usuários e alertas.
+                        </div>
+                    </div>
+
+                    <div class="alert alert-info">
+                        <h6><i class="bi bi-info-circle"></i> Informações Importantes</h6>
+                        <ul class="mb-0">
+                            <li>Usuários comuns só podem visualizar seus próprios logs</li>
+                            <li>Apenas administradores podem gerenciar permissões de dispositivos</li>
+                            <li>Após criar o usuário, configure suas permissões de acesso</li>
+                        </ul>
+                    </div>
+
+                    <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                        <a href="{{ url_for('users.users') }}" class="btn btn-secondary me-md-2">
+                            <i class="bi bi-arrow-left"></i> Cancelar
+                        </a>
+                        <button type="submit" class="btn btn-success">
+                            <i class="bi bi-person-check"></i> Criar Usuário
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    // Validação de confirmação de senha
+    document.getElementById('password').addEventListener('input', validatePassword);
+    document.getElementById('confirm_password').addEventListener('input', validatePassword);
+
+    function validatePassword() {
+        const password = document.getElementById('password');
+        const confirm = document.getElementById('confirm_password');
+        
+        if (password.value !== confirm.value) {
+            confirm.setCustomValidity('As senhas não coincidem');
+        } else {
+            confirm.setCustomValidity('');
+        }
+    }
+</script>
+{% endblock %}

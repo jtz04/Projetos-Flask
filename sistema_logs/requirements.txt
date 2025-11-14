@@ -1,0 +1,19 @@
+"""
+Dependências Python da aplicação.
+Instalar com: pip install -r requirements.txt
+"""
+
+# Framework web
+Flask==2.3.3
+
+# ORM (Object-Relational Mapping) para banco de dados
+Flask-SQLAlchemy==3.0.5
+
+# Autenticação e gerenciamento de usuários
+Flask-Login==0.6.3
+
+# Migrations/versionamento do banco de dados (Alembic wrapper)
+Flask-Migrate==4.0.4
+
+# Utilitários do Werkzeug (hashing de senhas, etc)
+Werkzeug==2.3.6

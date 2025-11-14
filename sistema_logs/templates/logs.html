@@ -1,0 +1,181 @@
+<!-- 
+    ARQUIVO: logs.html
+    DESCRIÇÃO: Página de visualização e análise de logs de acesso
+    
+    Recursos:
+    - Filtros avançados (usuário, data, suspeito)
+    - Tabela responsiva com detalhes de acesso
+    - Exportação para CSV
+    - Tooltips com informações detalhadas
+    - Ordenação de colunas
+-->
+
+{% extends "base.html" %}
+
+{% block title %}Logs de Acesso - Sistema de Logs{% endblock %}
+
+{% block content %}
+<!-- Cabeçalho com título e botão de exportação -->
+<div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+    <h1 class="h2"><i class="bi bi-list-check"></i> Logs de Acesso</h1>
+    <div class="btn-toolbar mb-2 mb-md-0">
+        <div class="btn-group me-2">
+            <!-- Botão para exportar tabela em CSV -->
+            <button type="button" class="btn btn-sm btn-outline-secondary" onclick="exportTableToCSV('logs.csv')">
+                <i class="bi bi-download"></i> Exportar CSV
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- ========== SEÇÃO DE FILTROS ========== -->
+<!-- Permite filtrar logs por vários critérios -->
+<div class=\"card shadow mb-4\">
+    <div class="card-header bg-light">
+        <h6 class="m-0 font-weight-bold text-primary"><i class="bi bi-funnel"></i> Filtros</h6>
+    </div>
+    <div class="card-body">
+        <form method="GET" class="row g-3">
+            {% if current_user.role.value == 'admin' %}
+            <div class="col-md-3">
+                <label for="user_id" class="form-label">Usuário</label>
+                <select class="form-select" id="user_id" name="user_id">
+                    <option value="">Todos os usuários</option>
+                    <!-- Opções de usuários seriam preenchidas via JavaScript -->
+                </select>
+            </div>
+            {% endif %}
+            <div class="col-md-3">
+                <label for="date_from" class="form-label">Data Início</label>
+                <input type="date" class="form-control" id="date_from" name="date_from">
+            </div>
+            <div class="col-md-3">
+                <label for="date_to" class="form-label">Data Fim</label>
+                <input type="date" class="form-control" id="date_to" name="date_to">
+            </div>
+            <div class="col-md-3">
+                <label for="suspicious" class="form-label">Tipo</label>
+                <select class="form-select" id="suspicious" name="suspicious">
+                    <option value="">Todos os logs</option>
+                    <option value="true">Apenas suspeitos</option>
+                </select>
+            </div>
+            <div class="col-12">
+                <button type="submit" class="btn btn-primary">
+                    <i class="bi bi-filter"></i> Aplicar Filtros
+                </button>
+                <a href="{{ url_for('logs.logs') }}" class="btn btn-outline-secondary">Limpar</a>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Tabela de Logs -->
+<div class="card shadow">
+    <div class="card-header bg-light d-flex justify-content-between align-items-center">
+        <h6 class="m-0 font-weight-bold text-primary">Registros de Acesso</h6>
+        <span class="badge bg-primary">{{ logs|length }} registros</span>
+    </div>
+    <div class="card-body">
+        <div class="table-responsive">
+            <table class="table table-hover table-striped" id="logsTable">
+                <thead class="table-light">
+                    <tr>
+                        <th>ID</th>
+                        {% if current_user.role.value == 'admin' %}
+                        <th>Usuário</th>
+                        {% endif %}
+                        <th>Dispositivo</th>
+                        <th>Ação</th>
+                        <th>Status</th>
+                        <th>IP</th>
+                        <th>Data/Hora</th>
+                        <th>Detalhes</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for log in logs %}
+                    <tr class="{% if log.is_suspicious %}table-warning{% endif %}">
+                        <td><small class="text-muted">#{{ log.id }}</small></td>
+                        {% if current_user.role.value == 'admin' %}
+                        <td>
+                            <strong>{{ log.user.username }}</strong>
+                            {% if log.is_suspicious %}
+                            <i class="bi bi-exclamation-triangle-fill text-warning" title="Atividade Suspeita"></i>
+                            {% endif %}
+                        </td>
+                        {% endif %}
+                        <td>{{ log.device.name if log.device else 'Sistema' }}</td>
+                        <td>
+                            <span class="badge bg-secondary">{{ log.action }}</span>
+                        </td>
+                        <td>
+                            <span class="badge {% if log.status == 'success' %}bg-success{% else %}bg-danger{% endif %}">
+                                {{ log.status }}
+                            </span>
+                        </td>
+                        <td><code>{{ log.ip_address }}</code></td>
+                        <td>{{ log.access_time.strftime('%d/%m/%Y %H:%M:%S') }}</td>
+                        <td>
+                            {% if log.details %}
+                            <button class="btn btn-sm btn-outline-info" 
+                                    data-bs-toggle="tooltip" 
+                                    title="{{ log.details }}">
+                                <i class="bi bi-info-circle"></i>
+                            </button>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        {% if not logs %}
+        <div class="text-center py-5">
+            <i class="bi bi-list-check display-1 text-muted"></i>
+            <h3 class="text-muted">Nenhum Log Encontrado</h3>
+            <p class="text-muted">Não há registros de acesso para os filtros aplicados.</p>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    // Ativar tooltips
+    var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
+    var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+        return new bootstrap.Tooltip(tooltipTriggerEl)
+    });
+
+    // Função para exportar CSV
+    function exportTableToCSV(filename) {
+        var csv = [];
+        var rows = document.querySelectorAll("#logsTable tr");
+        
+        for (var i = 0; i < rows.length; i++) {
+            var row = [], cols = rows[i].querySelectorAll("td, th");
+            
+            for (var j = 0; j < cols.length; j++) {
+                // Remover ícones e badges para o CSV
+                let text = cols[j].innerText.replace(/⏎/g, '\n');
+                row.push('"' + text + '"');
+            }
+            
+            csv.push(row.join(","));        
+        }
+
+        // Download do arquivo CSV
+        var csvFile = new Blob([csv.join("\n")], {type: "text/csv"});
+        var downloadLink = document.createElement("a");
+        downloadLink.download = filename;
+        downloadLink.href = window.URL.createObjectURL(csvFile);
+        downloadLink.style.display = "none";
+        document.body.appendChild(downloadLink);
+        downloadLink.click();
+        document.body.removeChild(downloadLink);
+    }
+</script>
+{% endblock %}

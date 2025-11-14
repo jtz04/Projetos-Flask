@@ -1,0 +1,283 @@
+/**
+ * ARQUIVO: style.css
+ * DESCRIÇÃO: Estilos customizados para o Sistema de Logs
+ * 
+ * Contém:
+ * - Variáveis de cores (CSS custom properties)
+ * - Estilos de componentes (cards, tabelas, botões)
+ * - Efeitos visuais (sombras, animações, hover)
+ * - Utilidades de layout e responsividade
+ * - Suporte para modo escuro (dark mode)
+ */
+
+/* ========== VARIÁVEIS DE CORES (CSS Custom Properties) ========== */
+:root {
+    --primary-color: #2c3e50;      /* Azul primário */
+    --secondary-color: #34495e;    /* Azul secundário */
+    --accent-color: #3498db;       /* Cor de destaque */
+    --success-color: #27ae60;      /* Verde - sucesso */
+    --warning-color: #f39c12;      /* Laranja - aviso */
+    --danger-color: #e74c3c;       /* Vermelho - erro */
+    --light-color: #ecf0f1;        /* Cinza claro */
+    --dark-color: #2c3e50;         /* Cinza escuro */
+}
+
+/* ========== ESTILOS GLOBAIS ========== */
+/* Body: Cor de fundo, fontes padrão */
+body {
+    background-color: #f8f9fa;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+/* ========== CARDS - Componentes principais ========== */
+/* Cards com sombra suave para depth visual */
+.card {
+    box-shadow: 0 0.15rem 1.75rem 0 rgba(58, 59, 69, 0.15);
+    border: 1px solid #e3e6f0;
+}
+
+/* Header dos cards com fundo claro */
+.card-header {
+    background-color: #f8f9fc;
+    border-bottom: 1px solid #e3e6f0;
+}
+
+/* ========== NAVBAR - Navegação ========== */
+/* Marca da navbar com peso de fonte maior */
+.navbar-brand {
+    font-weight: 600;
+}
+
+/* Links da navbar com cor clara e hover */
+.navbar-dark .navbar-nav .nav-link {
+    color: rgba(255, 255, 255, 0.9);
+}
+
+.navbar-dark .navbar-nav .nav-link:hover {
+    color: #fff;
+}
+
+/* ========== BADGES - Etiquetas de status ========== */
+/* Badges com peso de fonte aumentado */
+.badge {
+    font-weight: 500;
+}
+
+/* ========== TABELAS ========== */
+/* Efeito hover nas linhas da tabela */
+.table-hover tbody tr:hover {
+    background-color: rgba(0, 0, 0, 0.075);
+}
+
+/* Cabeçalho da tabela: maiúsculas, peso de fonte, espaçamento */
+.table th {
+    border-top: none;
+    font-weight: 600;
+    text-transform: uppercase;
+    font-size: 0.8rem;
+    letter-spacing: 0.5px;
+}
+
+/* ========== CARDS DE ESTATÍSTICAS - Cards coloridos com borda ========== */
+/* Borda esquerda colorida para cards de KPIs */
+.card-border-left-primary {
+    border-left: 0.25rem solid #4e73df;
+}
+
+.card-border-left-success {
+    border-left: 0.25rem solid #1cc88a;
+}
+
+.card-border-left-warning {
+    border-left: 0.25rem solid #f6c23e;
+}
+
+.card-border-left-info {
+    border-left: 0.25rem solid #36b9cc;
+}
+
+/* ========== BOTÕES ========== */
+/* Botões com peso de fonte e bordas arredondadas */
+.btn {
+    font-weight: 500;
+    border-radius: 0.35rem;
+}
+
+.btn-sm {
+    border-radius: 0.25rem;
+}
+
+/* ========== ALERTAS ========== */
+/* Alertas sem borda, com raio e animação de fade-in */
+.alert {
+    border: none;
+    border-radius: 0.5rem;
+    font-weight: 500;
+}
+
+/* ========== LAYOUT E FLEX ========== */
+/* Altura 100% para html e body (footer fixo) */
+html, body {
+    height: 100%;
+}
+
+/* Flex layout para manter footer no fim */
+body {
+    display: flex;
+    flex-direction: column;
+}
+
+.container-fluid {
+    flex: 1;
+}
+
+/* ========== ESTADOS ========== */
+/* Estado de carregamento: opacidade reduzida */
+.loading {
+    opacity: 0.6;
+    pointer-events: none;
+}
+
+/* ========== INDICADORES DE STATUS ========== */
+/* Pequeno círculo colorido para status */
+.status-indicator {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    display: inline-block;
+    margin-right: 5px;
+}
+
+.status-active {
+    background-color: var(--success-color);
+}
+
+.status-inactive {
+    background-color: var(--danger-color);
+}
+
+/* ========== SCROLLBAR CUSTOMIZADA ========== */
+/* Estilos do scrollbar no webkit (Chrome, Safari, Edge) */
+::-webkit-scrollbar {
+    width: 8px;
+}
+
+::-webkit-scrollbar-track {
+    background: #f1f1f1;
+}
+
+::-webkit-scrollbar-thumb {
+    background: #c1c1c1;
+    border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: #a8a8a8;
+}
+
+/* ========== TABELAS RESPONSIVAS ========== */
+/* Bordas arredondadas em tabelas responsivas */
+.table-responsive {
+    border-radius: 0.35rem;
+}
+
+/* ========== ELEMENTOS DE CÓDIGO ========== */
+/* Estilo para blocos de código inline */
+code {
+    background-color: #f8f9fa;
+    padding: 0.2rem 0.4rem;
+    border-radius: 0.25rem;
+    font-size: 0.875em;
+    color: #e83e8c;
+}
+
+/* ========== SOMBRAS CUSTOMIZADAS ========== */
+/* Sombra pequena */
+.shadow-sm {
+    box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075) !important;
+}
+
+/* Efeito hover com sombra aumentada */
+.hover-shadow:hover {
+    box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15) !important;
+    transition: box-shadow 0.15s ease-in-out;
+}
+
+/* ========== UTILIDADES DE TEXTO ========== */
+/* Tamanhos de texto customizados */
+.text-xs {
+    font-size: 0.7rem;
+}
+
+.text-sm {
+    font-size: 0.875rem;
+}
+
+/* ========== UTILIDADES DE BORDA ========== */
+/* Bordas coloridas à esquerda */
+.border-left-primary {
+    border-left: 4px solid #4e73df !important;
+}
+
+.border-left-success {
+    border-left: 4px solid #1cc88a !important;
+}
+
+.border-left-warning {
+    border-left: 4px solid #f6c23e !important;
+}
+
+.border-left-info {
+    border-left: 4px solid #36b9cc !important;
+}
+
+/* ========== ÍCONES ========== */
+/* Alinhamento vertical para ícones Bootstrap */
+.bi {
+    vertical-align: -0.125em;
+}
+
+/* ========== GRADIENTES CUSTOMIZADOS ========== */
+/* Fundo gradiente azul */
+.bg-gradient-primary {
+    background: linear-gradient(45deg, #4e73df, #224abe);
+}
+
+/* ========== ANIMAÇÕES ========== */
+/* Animação de fade-in para alertas */
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(-10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.alert {
+    animation: fadeIn 0.3s ease-out;
+}
+
+/* ========== MEDIA QUERIES - RESPONSIVIDADE ========== */
+
+/* ========== IMPRESSÃO ========== */
+/* Estilos para impressão: esconder navegação e botões */
+@media print {
+    .navbar, .btn, .alert, .card-footer {
+        display: none !important;
+    }
+    
+    .card {
+        border: 1px solid #000 !important;
+        box-shadow: none !important;
+    }
+}
+
+/* ========== MODO ESCURO (Dark Mode) ========== */
+/* Suporte para preferência de modo escuro do sistema */
+@media (prefers-color-scheme: dark) {
+    .bg-light {
+        background-color: #495057 !important;
+        color: #f8f9fa;
+    }
+    
+    .table {
+        color: #f8f9fa;
+    }
+}

@@ -1,0 +1,133 @@
+<!-- 
+    ARQUIVO: devices.html
+    DESCRIÇÃO: Página de gerenciamento de dispositivos
+    
+    Exibe:
+    - Cards com lista de dispositivos
+    - Status de ativação
+    - Botão de acesso (com verificação de permissão)
+    - Tipos de dispositivos e legenda
+    - Opção para criar novo dispositivo (Admin only)
+-->
+
+{% extends "base.html" %}
+
+{% block title %}Dispositivos - Sistema de Logs{% endblock %}
+
+{% block content %}
+<!-- Cabeçalho com título e botão de novo dispositivo -->
+<div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+    <h1 class="h2"><i class="bi bi-pc-display"></i> Dispositivos do Sistema</h1>
+    {% if current_user.role.value == 'admin' %}
+    <div class="btn-toolbar mb-2 mb-md-0">
+        <a href="{{ url_for('devices.add_device') }}" class="btn btn-success">
+            <i class="bi bi-plus-circle"></i> Novo Dispositivo
+        </a>
+    </div>
+    {% endif %}
+</div>
+
+<!-- Grid de dispositivos em cards -->
+<div class="row">
+    {% for device in devices %}
+    <div class="col-xl-4 col-md-6 mb-4">
+        <div class="card border-{% if device.id in permitted_devices or current_user.role.value == 'admin' %}primary{% else %}secondary{% endif %} shadow h-100">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h6 class="m-0 font-weight-bold text-{% if device.id in permitted_devices or current_user.role.value == 'admin' %}primary{% else %}secondary{% endif %}">
+                    {{ device.name }}
+                </h6>
+                <span class="badge bg-{{ 'success' if device.is_active else 'danger' }}">
+                    {{ 'Ativo' if device.is_active else 'Inativo' }}
+                </span>
+            </div>
+            <div class="card-body">
+                <div class="row no-gutters align-items-center">
+                    <div class="col mr-2">
+                        <div class="text-xs font-weight-bold text-uppercase mb-1">
+                            <i class="bi bi-{% if device.device_type.value == 'server' %}hdd{% elif device.device_type.value == 'camera' %}camera-video{% else %}pc{% endif %}"></i>
+                            {{ device.device_type.value|title }}
+                        </div>
+                        <div class="mb-2">
+                            <strong>IP:</strong> <code>{{ device.ip_address }}</code>
+                        </div>
+                        {% if device.location %}
+                        <div class="mb-2">
+                            <strong>Local:</strong> {{ device.location }}
+                        </div>
+                        {% endif %}
+                        {% if device.description %}
+                        <div class="mb-2">
+                            <small class="text-muted">{{ device.description }}</small>
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+            <div class="card-footer">
+                {% if device.id in permitted_devices or current_user.role.value == 'admin' %}
+                <a href="{{ url_for('devices.access_device', device_id=device.id) }}" 
+                   class="btn btn-primary btn-sm">
+                    <i class="bi bi-box-arrow-in-right"></i> Acessar
+                </a>
+                {% else %}
+                <button class="btn btn-secondary btn-sm" disabled title="Sem permissão de acesso">
+                    <i class="bi bi-lock"></i> Sem Acesso
+                </button>
+                {% endif %}
+                
+                {% if current_user.role.value == 'admin' %}
+                <span class="badge bg-info float-end">
+                    {{ device.logs|length }} logs
+                </span>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+
+{% if not devices %}
+<div class="text-center py-5">
+    <i class="bi bi-pc-display-horizontal display-1 text-muted"></i>
+    <h3 class="text-muted">Nenhum Dispositivo Cadastrado</h3>
+    <p class="text-muted">Adicione dispositivos para começar o monitoramento.</p>
+    {% if current_user.role.value == 'admin' %}
+    <a href="{{ url_for('devices.add_device') }}" class="btn btn-primary">
+        <i class="bi bi-plus-circle"></i> Adicionar Primeiro Dispositivo
+    </a>
+    {% endif %}
+</div>
+{% endif %}
+
+<div class="row mt-4">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <h6 class="mb-0"><i class="bi bi-info-circle"></i> Informações</h6>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <h6>Tipos de Dispositivos:</h6>
+                        <ul class="list-unstyled">
+                            <li><i class="bi bi-pc text-primary"></i> Computador - Estações de trabalho</li>
+                            <li><i class="bi bi-hdd text-success"></i> Servidor - Serviços e aplicações</li>
+                            <li><i class="bi bi-camera-video text-warning"></i> Câmera - Dispositivos de vigilância</li>
+                            <li><i class="bi bi-router text-info"></i> Roteador - Dispositivos de rede</li>
+                        </ul>
+                    </div>
+                    <div class="col-md-6">
+                        <h6>Legenda de Acesso:</h6>
+                        <p>
+                            <span class="badge bg-primary">Acesso Permitido</span> - Você tem permissão para este dispositivo<br>
+                            <span class="badge bg-secondary">Sem Acesso</span> - Permissão necessária<br>
+                            <span class="badge bg-success">Ativo</span> - Dispositivo operacional<br>
+                            <span class="badge bg-danger">Inativo</span> - Dispositivo desativado
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

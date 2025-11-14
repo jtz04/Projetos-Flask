@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+
+<!-- ========== TEMPLATE: PÁGINA 404 ========== -->
+<!-- Exibe quando um recurso não é encontrado -->
+
+{% block content %}
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <!-- Cartão de erro 404 -->
+            <div class="card text-center border-danger shadow-lg">
+                <div class="card-body p-5">
+                    <!-- Número do erro -->
+                    <h1 class="display-1 text-danger">404</h1>
+                    
+                    <!-- Título do erro -->
+                    <h2 class="card-title mb-3">Página Não Encontrada</h2>
+                    
+                    <!-- Descrição -->
+                    <p class="card-text text-muted mb-4">
+                        A página que você está procurando não existe ou foi movida.
+                    </p>
+                    
+                    <!-- Botão para voltar ao início -->
+                    <a href="{{ url_for('main.dashboard') }}" class="btn btn-primary btn-lg">
+                        <i class="bi bi-house"></i> Voltar ao Dashboard
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
