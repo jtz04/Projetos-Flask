@@ -103,15 +103,15 @@
 <!-- Logs Recentes -->
 <div class="row">
     <div class="col-12">
-        <div class="card shadow">
-            <div class="card-header bg-light">
-                <h6 class="m-0 font-weight-bold text-primary">
+        <div class="card shadow" style="background-color: #2d1b4e;">
+            <div class="card-header" style="background-color: #1a0f2e; border-bottom: 2px solid #8b5cf6;">
+                <h6 class="m-0 font-weight-bold" style="color: #a58cdf; font-size: 1.1rem;">
                     <i class="bi bi-clock-history"></i> Logs de Acesso Recentes
                 </h6>
             </div>
-            <div class="card-body">
-                <div class="table-responsive">
-                    <table class="table table-hover" id="recentLogsTable">
+            <div class="card-body" style="background-color: #2d1b4e; padding: 0;">
+                <div class="table-responsive" style="background-color: #2d1b4e;">
+                    <table class="table table-hover" id="recentLogsTable" style="color: #f3f4f6; margin-bottom: 0;">
                         <thead>
                             <tr>
                                 <th>Usuário</th>
@@ -149,9 +149,9 @@
                         </tbody>
                     </table>
                 </div>
-                <!-- Link para ver todos os logs -->
-                <div class="text-center mt-3">
-                    <a href="{{ url_for('logs.logs') }}" class="btn btn-outline-primary btn-sm">
+                <!-- Link para ver todos os logs (reduzir espaço superior) -->
+                <div class="text-center mt-1">
+                    <a href="{{ url_for('logs.logs') }}" class="btn btn-outline-primary btn-sm" style="transform: translateY(-4px);">
                         <i class="bi bi-list-check"></i> Ver Todos os Logs
                     </a>
                 </div>

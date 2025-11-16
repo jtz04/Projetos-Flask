@@ -19,6 +19,7 @@ from blueprints.devices import devices_bp
 from blueprints.logs import logs_bp
 from blueprints.alerts import alerts_bp
 from werkzeug.security import generate_password_hash
+import pytz
 
 
 def create_app(config_name='default'):
@@ -35,6 +36,23 @@ def create_app(config_name='default'):
     
     # Carregar configurações do arquivo config.py baseado no ambiente
     app.config.from_object(config[config_name])
+    
+    # ========== REGISTRAR FILTROS JINJA ==========
+    # Filtro para formatar datetime em fuso horário de Brasília
+    def format_brasilia_time(dt, fmt='%d/%m/%Y %H:%M:%S'):
+        """Formata datetime no fuso horário de Brasília"""
+        if dt is None:
+            return ''
+        brasilia_tz = pytz.timezone('America/Sao_Paulo')
+        # Se o datetime já tem timezone info, converte para Brasília
+        if dt.tzinfo is not None:
+            dt = dt.astimezone(brasilia_tz)
+        # Se não tem timezone, assume que já está em Brasília (salvo em Brasília)
+        else:
+            dt = brasilia_tz.localize(dt)
+        return dt.strftime(fmt)
+    
+    app.jinja_env.filters['format_brasilia_time'] = format_brasilia_time
     
     # ========== INICIALIZAR EXTENSÕES ==========
     # SQLAlchemy: ORM para banco de dados

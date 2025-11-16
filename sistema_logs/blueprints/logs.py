@@ -8,8 +8,9 @@ Responsável por:
 
 from flask import Blueprint, render_template, request, jsonify
 from flask_login import login_required, current_user
-from models import AccessLog, UserRole
+from models import AccessLog, UserRole, get_brasilia_now
 from datetime import datetime, timedelta
+import pytz
 
 # Criação do blueprint
 logs_bp = Blueprint('logs', __name__)
@@ -105,7 +106,7 @@ def logs_stats():
     failed_logins = AccessLog.query.filter_by(action='failed_login', status='failed').count()
     
     # Logs das últimas 24 horas
-    last_24h = datetime.utcnow() - timedelta(hours=24)
+    last_24h = get_brasilia_now() - timedelta(hours=24)
     recent_logs = AccessLog.query.filter(AccessLog.access_time >= last_24h).count()
     
     # Retornar como JSON

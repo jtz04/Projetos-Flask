@@ -14,7 +14,14 @@ from extensions import db
 from flask_login import UserMixin
 from datetime import datetime
 import enum
+import pytz
 
+# Define fuso horário de Brasília
+brasilia_tz = pytz.timezone('America/Sao_Paulo')
+
+def get_brasilia_now():
+    """Retorna data/hora atual no fuso horário de Brasília"""
+    return datetime.now(brasilia_tz)
 
 # ========== ENUMS (Valores predefinidos) ==========
 
@@ -52,7 +59,7 @@ class User(UserMixin, db.Model):
     email = db.Column(db.String(120), unique=True, nullable=False)
     password_hash = db.Column(db.String(255), nullable=False)
     role = db.Column(db.Enum(UserRole), default=UserRole.USER)
-    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    created_at = db.Column(db.DateTime, default=get_brasilia_now)
     is_active = db.Column(db.Boolean, default=True)  # Usuário ativo ou desativado?
     
     # Relacionamentos (um usuário tem muitas permissões e logs)
@@ -76,7 +83,7 @@ class Device(db.Model):
     description = db.Column(db.Text)  # Descrição livre do dispositivo
     location = db.Column(db.String(200))  # Localização física
     is_active = db.Column(db.Boolean, default=True)  # Dispositivo ativo ou inativo?
-    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    created_at = db.Column(db.DateTime, default=get_brasilia_now)
     
     # Relacionamentos (um dispositivo tem muitas permissões e logs)
     user_permissions = db.relationship('UserPermission', backref='device', lazy=True, cascade='all, delete-orphan')
@@ -93,7 +100,7 @@ class UserPermission(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
     device_id = db.Column(db.Integer, db.ForeignKey('device.id'), nullable=True)  # Opcional para logs de login
-    granted_at = db.Column(db.DateTime, default=datetime.utcnow)  # Quando a permissão foi concedida
+    granted_at = db.Column(db.DateTime, default=get_brasilia_now)  # Quando a permissão foi concedida
     granted_by = db.Column(db.Integer, db.ForeignKey('user.id'))  # Qual admin concedeu?
     
     # Permissões específicas
@@ -112,7 +119,7 @@ class AccessLog(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
     device_id = db.Column(db.Integer, db.ForeignKey('device.id'), nullable=True)  # Opcional para logs de login
-    access_time = db.Column(db.DateTime, default=datetime.utcnow)  # Quando aconteceu?
+    access_time = db.Column(db.DateTime, default=get_brasilia_now)  # Quando aconteceu?
     action = db.Column(db.String(50), nullable=False)  # Qual ação (login, read, write, etc)
     status = db.Column(db.String(20), nullable=False)  # Sucesso ou falha?
     ip_address = db.Column(db.String(45))  # IP do usuário
@@ -132,7 +139,7 @@ class Alert(db.Model):
     title = db.Column(db.String(200), nullable=False)  # Título do alerta
     description = db.Column(db.Text)  # Descrição detalhada
     alert_level = db.Column(db.Enum(AlertLevel), default=AlertLevel.MEDIUM)  # Severidade
-    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    created_at = db.Column(db.DateTime, default=get_brasilia_now)
     resolved_at = db.Column(db.DateTime)  # Quando foi resolvido?
     is_resolved = db.Column(db.Boolean, default=False)  # Alerta já foi tratado?
     

@@ -30,9 +30,9 @@
 
 <!-- ========== SEÇÃO DE FILTROS ========== -->
 <!-- Permite filtrar logs por vários critérios -->
-<div class=\"card shadow mb-4\">
-    <div class="card-header bg-light">
-        <h6 class="m-0 font-weight-bold text-primary"><i class="bi bi-funnel"></i> Filtros</h6>
+<div class="card shadow mb-4 filters-card">
+    <div class="card-header filters-card-header">
+        <h6 class="m-0 font-weight-bold filters-card-title" style="color: #fcfbfb;"><i class="bi bi-funnel"></i> Filtros</h6>
     </div>
     <div class="card-body">
         <form method="GET" class="row g-3">
@@ -72,13 +72,15 @@
 
 <!-- Tabela de Logs -->
 <div class="card shadow">
-    <div class="card-header bg-light d-flex justify-content-between align-items-center">
-        <h6 class="m-0 font-weight-bold text-primary">Registros de Acesso</h6>
+    <div class="card-header access-card-header d-flex justify-content-between align-items-center">
+        <h6 class="m-0 font-weight-bold access-card-title">
+            <i class="bi bi-list-check"></i> Registros de Acesso
+        </h6>
         <span class="badge bg-primary">{{ logs|length }} registros</span>
     </div>
     <div class="card-body">
-        <div class="table-responsive">
-            <table class="table table-hover table-striped" id="logsTable">
+        <div class="table-responsive" style="background-color: #2d1b4e; border-radius: 0.35rem;">
+            <table class="table table-hover table-striped" id="logsTable" style="color: #f3f4f6; margin-bottom: 0;">
                 <thead class="table-light">
                     <tr>
                         <th>ID</th>
@@ -115,7 +117,7 @@
                             </span>
                         </td>
                         <td><code>{{ log.ip_address }}</code></td>
-                        <td>{{ log.access_time.strftime('%d/%m/%Y %H:%M:%S') }}</td>
+                        <td>{{ log.access_time|format_brasilia_time }}</td>
                         <td>
                             {% if log.details %}
                             <button class="btn btn-sm btn-outline-info" 

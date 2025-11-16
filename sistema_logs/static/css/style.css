@@ -12,37 +12,73 @@
 
 /* ========== VARIÁVEIS DE CORES (CSS Custom Properties) ========== */
 :root {
-    --primary-color: #2c3e50;      /* Azul primário */
-    --secondary-color: #34495e;    /* Azul secundário */
-    --accent-color: #3498db;       /* Cor de destaque */
-    --success-color: #27ae60;      /* Verde - sucesso */
-    --warning-color: #f39c12;      /* Laranja - aviso */
-    --danger-color: #e74c3c;       /* Vermelho - erro */
-    --light-color: #ecf0f1;        /* Cinza claro */
-    --dark-color: #2c3e50;         /* Cinza escuro */
+    --primary-color: #1a0f2e;      /* Roxo muito escuro - quase preto */
+    --secondary-color: #2d1b4e;    /* Roxo escuro */
+    --accent-color: #8b5cf6;       /* Roxo vibrante */
+    --success-color: #10b981;      /* Verde - sucesso */
+    --warning-color: #f59e0b;      /* Laranja - aviso */
+    --danger-color: #ef4444;       /* Vermelho - erro */
+    --light-color: #f3f4f6;        /* Cinza claro */
+    --dark-color: #1a0f2e;         /* Roxo muito escuro */
 }
+
+/* (fonte do footer removida para preservar fonte global) */
 
 /* ========== ESTILOS GLOBAIS ========== */
 /* Body: Cor de fundo, fontes padrão */
 body {
-    background-color: #f8f9fa;
+    background-color: #0f0a1a;
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    color: #f3f4f6;
 }
 
 /* ========== CARDS - Componentes principais ========== */
 /* Cards com sombra suave para depth visual */
 .card {
-    box-shadow: 0 0.15rem 1.75rem 0 rgba(58, 59, 69, 0.15);
-    border: 1px solid #e3e6f0;
+    box-shadow: 0 0.15rem 1.75rem 0 rgba(0, 0, 0, 0.5);
+    border: 1px solid #3d2563;
+    background-color: #1a0f2e;
+    color: #f3f4f6;
 }
 
-/* Header dos cards com fundo claro */
+/* Header dos cards com fundo roxo */
 .card-header {
-    background-color: #f8f9fc;
-    border-bottom: 1px solid #e3e6f0;
+    background-color: #2d1b4e;
+    border-bottom: 1px solid #3d2563;
+    color: #f3f4f6;
 }
 
-/* ========== NAVBAR - Navegação ========== */
+/* Card específico para tabela de logs com fundo roxo escuro */
+.card:has(.table) {
+    background-color: #2d1b4e;
+    box-shadow: 0 0.5rem 2rem 0 rgba(139, 92, 246, 0.2);
+}
+
+.card:has(.table) .card-header {
+    background-color: #1a0f2e;
+    border-bottom: 2px solid #8b5cf6;
+    padding: 1.5rem !important;
+}
+
+.card:has(.table) .card-body {
+    background-color: #2d1b4e;
+    padding: 0;
+}
+
+.card:has(.table) .table th {
+    padding: 1rem;
+    font-size: 1rem;
+}
+
+.card:has(.table) .table td {
+    padding: 1rem;
+    font-size: 1rem;
+    vertical-align: middle;
+}
+
+.card:has(.table) .table-responsive {
+    min-height: 600px;
+}
 /* Marca da navbar com peso de fonte maior */
 .navbar-brand {
     font-weight: 600;
@@ -65,8 +101,10 @@ body {
 
 /* ========== TABELAS ========== */
 /* Efeito hover nas linhas da tabela */
-.table-hover tbody tr:hover {
-    background-color: rgba(0, 0, 0, 0.075);
+.table-hover tbody tr:hover,
+.table-hover tbody tr:hover td {
+    background-color: #120022 !important;
+    color: #7000a3 !important;
 }
 
 /* Cabeçalho da tabela: maiúsculas, peso de fonte, espaçamento */
@@ -76,24 +114,112 @@ body {
     text-transform: uppercase;
     font-size: 0.8rem;
     letter-spacing: 0.5px;
+    background-color: #1a0f2e !important;
+    color: #8b5cf6 !important;
+}
+
+/* Linhas da tabela com melhor contraste */
+.table tbody tr {
+    background-color: #2d1b4e;
+    color: #f3f4f6;
+    border-top: 1px solid #3d2563;
+}
+
+.table tbody tr td {
+    color: #f3f4f6;
+    font-weight: 500;
+}
+
+/* Garantir que linhas com destaque (ex: table-warning) permaneçam legíveis
+   no tema escuro: fundo levemente roxo e texto claro */
+.table tbody tr.table-warning {
+    background-color: rgba(139,92,246,0.08) !important; /* leve destaque roxo */
+}
+
+.table tbody tr.table-warning td,
+.table tbody tr.table-warning td * {
+    color: #f3f4f6 !important;
+}
+
+/* Ajuste para pequenos elementos 'text-muted' dentro da tabela (IDs etc.)
+   para que não fiquem invisíveis sobre o fundo escuro */
+.table tbody tr td small.text-muted {
+    color: #d1c7e9 !important; /* tom claro e suave de roxo */
+}
+
+/* ====== Styles for the Filters card (logs page) ====== */
+.filters-card {
+    border-radius: 0.9rem; /* round the whole card */
+    overflow: hidden; /* keep header rounded */
+}
+
+.filters-card .filters-card-header {
+    background-color: #1d122b; /* darker purple/near-black */
+    border-bottom: 1px solid rgba(139,92,246,0.18);
+    padding: 0.8rem 1rem;
+    /* round only the top corners of the header */
+    border-top-left-radius: 0.9rem;
+    border-top-right-radius: 0.9rem;
+}
+
+.filters-card .filters-card-title {
+    color: #fcfbfb !important; /* ensure title is near-white */
+    font-size: 1rem;
+}
+
+/* If you need the header class that matches `bg-dark d-flex ...` to change,
+   target via this helper class instead of globally overriding Bootstrap */
+.card-header.bg-dark.custom-dark-header {
+    background-color: #15101f !important;
+    color: #fcfbfb !important;
+    border-bottom: 1px solid rgba(139,92,246,0.16) !important;
+    border-top-left-radius: 0.6rem;
+    border-top-right-radius: 0.6rem;
+}
+
+/* ====== Access Logs card header styling ====== */
+.access-card-header {
+    background-color: #15101f; /* darker purple/near-black */
+    border-bottom: 2px solid rgba(139,92,246,0.16);
+    padding: 0.9rem 1rem;
+}
+
+.access-card-header .access-card-title {
+    color: #e6d9fc !important; /* theme purple */
+    font-size: 1.3rem;
+    margin: 0;
+}
+
+/* Cabeçalho da tabela com fundo escuro */
+.table-light {
+    background-color: #1a0f2e !important;
+}
+
+.table-light th {
+    color: #8b5cf6 !important;
+    background-color: #1a0f2e !important;
+}
+
+.table {
+    color: #f3f4f6;
 }
 
 /* ========== CARDS DE ESTATÍSTICAS - Cards coloridos com borda ========== */
 /* Borda esquerda colorida para cards de KPIs */
 .card-border-left-primary {
-    border-left: 0.25rem solid #4e73df;
+    border-left: 0.25rem solid #8b5cf6;
 }
 
 .card-border-left-success {
-    border-left: 0.25rem solid #1cc88a;
+    border-left: 0.25rem solid #10b981;
 }
 
 .card-border-left-warning {
-    border-left: 0.25rem solid #f6c23e;
+    border-left: 0.25rem solid #f59e0b;
 }
 
 .card-border-left-info {
-    border-left: 0.25rem solid #36b9cc;
+    border-left: 0.25rem solid #06b6d4;
 }
 
 /* ========== BOTÕES ========== */
@@ -184,11 +310,11 @@ body {
 /* ========== ELEMENTOS DE CÓDIGO ========== */
 /* Estilo para blocos de código inline */
 code {
-    background-color: #f8f9fa;
+    background-color: #1a0f2e;
     padding: 0.2rem 0.4rem;
     border-radius: 0.25rem;
     font-size: 0.875em;
-    color: #e83e8c;
+    color: #a78bfa;
 }
 
 /* ========== SOMBRAS CUSTOMIZADAS ========== */
@@ -216,19 +342,19 @@ code {
 /* ========== UTILIDADES DE BORDA ========== */
 /* Bordas coloridas à esquerda */
 .border-left-primary {
-    border-left: 4px solid #4e73df !important;
+    border-left: 4px solid #8b5cf6 !important;
 }
 
 .border-left-success {
-    border-left: 4px solid #1cc88a !important;
+    border-left: 4px solid #10b981 !important;
 }
 
 .border-left-warning {
-    border-left: 4px solid #f6c23e !important;
+    border-left: 4px solid #f59e0b !important;
 }
 
 .border-left-info {
-    border-left: 4px solid #36b9cc !important;
+    border-left: 4px solid #06b6d4 !important;
 }
 
 /* ========== ÍCONES ========== */
@@ -238,9 +364,9 @@ code {
 }
 
 /* ========== GRADIENTES CUSTOMIZADOS ========== */
-/* Fundo gradiente azul */
+/* Fundo gradiente roxo */
 .bg-gradient-primary {
-    background: linear-gradient(45deg, #4e73df, #224abe);
+    background: linear-gradient(45deg, #8b5cf6, #6d28d9);
 }
 
 /* ========== ANIMAÇÕES ========== */
@@ -273,11 +399,170 @@ code {
 /* Suporte para preferência de modo escuro do sistema */
 @media (prefers-color-scheme: dark) {
     .bg-light {
-        background-color: #495057 !important;
-        color: #f8f9fa;
+        background-color: #2d1b4e !important;
+        color: #f3f4f6;
     }
     
     .table {
-        color: #f8f9fa;
+        color: #f3f4f6;
     }
+}
+
+/* ====== RODAPÉ (Footer) ====== */
+/* Use selector específico para sobrescrever classes Bootstrap quando presentes */
+footer.bg-dark.text-light, .site-footer, footer {
+    background-color: #07040a !important; /* bem escuro */
+    color: #e6ddff !important;
+    padding: 1rem 0;
+    border-top: 1px solid rgba(139,92,246,0.06);
+}
+footer.bg-dark.text-light p, .site-footer p, footer p {
+    margin: 0;
+    color: #e6ddff !important;
+    font-size: 0.9rem;
+}
+footer.bg-dark.text-light a, .site-footer a, footer a {
+    color: #cdb4ff !important;
+}
+footer.bg-dark.text-light a:hover, .site-footer a:hover, footer a:hover {
+    color: #ffffff !important;
+}
+
+/* Em telas pequenas, centralizar o texto para melhor visual */
+@media (max-width: 767.98px) {
+    footer.bg-dark.text-light, .site-footer, footer {
+        text-align: center;
+    }
+    footer .col-md-6, .site-footer .col-md-6 {
+        text-align: center;
+        margin-bottom: 0.4rem;
+    }
+}
+
+/* ========== NAVBAR CUSTOMIZADA COM TEMA ROXO ========== */
+.navbar-dark {
+    background-color: #0f0a1a !important;
+    border-bottom: 2px solid #8b5cf6;
+}
+
+.navbar-dark .navbar-brand {
+    color: #8b5cf6 !important;
+    font-weight: 700;
+    font-size: 1.3rem;
+}
+
+.navbar-dark .nav-link {
+    color: #d8b4fe !important;
+    transition: color 0.2s ease;
+}
+
+.navbar-dark .nav-link:hover {
+    color: #8b5cf6 !important;
+}
+
+.navbar-dark .nav-link.active {
+    color: #8b5cf6 !important;
+    border-bottom: 2px solid #8b5cf6;
+}
+
+.dropdown-menu {
+    background-color: #1a0f2e !important;
+    border: 1px solid #3d2563 !important;
+}
+
+.dropdown-item {
+    color: #d8b4fe !important;
+}
+
+.dropdown-item:hover,
+.dropdown-item.active {
+    background-color: #2d1b4e !important;
+    color: #8b5cf6 !important;
+}
+
+/* ========== FORMULÁRIOS ========== */
+.form-control {
+    background-color: #1a0f2e !important;
+    border: 1px solid #3d2563 !important;
+    color: #f3f4f6 !important;
+}
+
+.form-control:focus {
+    background-color: #2d1b4e !important;
+    border-color: #8b5cf6 !important;
+    color: #f3f4f6;
+    box-shadow: 0 0 0 0.2rem rgba(139, 92, 246, 0.25);
+}
+
+.form-select {
+    background-color: #1a0f2e !important;
+    border: 1px solid #3d2563 !important;
+    color: #f3f4f6 !important;
+}
+
+.form-select:focus {
+    border-color: #8b5cf6 !important;
+    box-shadow: 0 0 0 0.2rem rgba(139, 92, 246, 0.25);
+}
+
+.form-label {
+    color: #d8b4fe !important;
+    font-weight: 500;
+}
+
+/* ========== BOTÕES ========== */
+.btn-primary {
+    background-color: #8b5cf6 !important;
+    border-color: #8b5cf6 !important;
+}
+
+.btn-primary:hover {
+    background-color: #7c3aed !important;
+    border-color: #7c3aed !important;
+}
+
+.btn-outline-primary {
+    color: #8b5cf6 !important;
+    border-color: #8b5cf6 !important;
+}
+
+.btn-outline-primary:hover {
+    background-color: #8b5cf6 !important;
+    border-color: #8b5cf6 !important;
+    color: #0f0a1a !important;
+}
+
+.btn-secondary {
+    background-color: #3d2563 !important;
+    border-color: #3d2563 !important;
+}
+
+.btn-secondary:hover {
+    background-color: #2d1b4e !important;
+    border-color: #2d1b4e !important;
+}
+
+/* ========== BADGES ========== */
+.badge {
+    font-weight: 500;
+}
+
+.badge.bg-primary {
+    background-color: #8b5cf6 !important;
+}
+
+.badge.bg-success {
+    background-color: #10b981 !important;
+}
+
+.badge.bg-warning {
+    background-color: #f59e0b !important;
+}
+
+.badge.bg-danger {
+    background-color: #ef4444 !important;
+}
+
+.badge.bg-secondary {
+    background-color: #6366f1 !important;
 }
