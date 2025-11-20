@@ -1,0 +1,110 @@
+{% extends 'base.html' %}
+
+{#
+  Template para adicionar/editar dispositivos.
+  - Se a variável `device` for passada, o formulário entra em modo de edição
+  - Se for necessário, passe `users` (lista de usuários) para gerenciar permissões aqui
+#}
+
+{% block content %}
+<div class="container mt-4">
+  <div class="row justify-content-center">
+    <div class="col-lg-8">
+      <div class="card shadow-sm">
+        <div class="card-header d-flex justify-content-between align-items-center">
+          <h5 class="mb-0">{% if device %}Editar Dispositivo{% else %}Novo Dispositivo{% endif %}</h5>
+          <a href="{{ url_for('devices.devices') }}" class="btn btn-sm btn-outline-secondary">Voltar</a>
+        </div>
+        <div class="card-body">
+          <form method="post" action="{{ url_for('devices.add_device') }}">
+            {% if device %}
+              <input type="hidden" name="device_id" value="{{ device.id }}">
+            {% endif %}
+
+            <div class="mb-3">
+              <label for="name" class="form-label">Nome do dispositivo</label>
+              <input type="text" class="form-control" id="name" name="name" required value="{{ device.name if device else '' }}">
+            </div>
+
+            <div class="mb-3">
+              <label for="ip_address" class="form-label">Endereço IP</label>
+              <input type="text" class="form-control" id="ip_address" name="ip_address" placeholder="192.168.0.10" required value="{{ device.ip_address if device else '' }}">
+            </div>
+
+            <div class="mb-3">
+              <label for="device_type" class="form-label">Tipo</label>
+              <select class="form-select" id="device_type" name="device_type" required>
+                <option value="">-- Selecionar --</option>
+                {% for dt in device_types %}
+                  <option value="{{ dt.value }}" {% if device and device.device_type.value == dt.value %}selected{% endif %}>{{ dt.name.capitalize() }}</option>
+                {% endfor %}
+              </select>
+            </div>
+
+            <div class="mb-3">
+              <label for="location" class="form-label">Localização</label>
+              <input type="text" class="form-control" id="location" name="location" value="{{ device.location if device else '' }}">
+            </div>
+
+            <div class="mb-3">
+              <label for="description" class="form-label">Descrição</label>
+              <textarea class="form-control" id="description" name="description" rows="3">{{ device.description if device else '' }}</textarea>
+            </div>
+
+            <div class="form-check form-switch mb-3">
+              <input class="form-check-input" type="checkbox" id="is_active" name="is_active" value="1" {% if device and device.is_active %}checked{% elif not device %}checked{% endif %}>
+              <label class="form-check-label" for="is_active">Ativo</label>
+            </div>
+
+            {# Sessão de permissões (opcional) #}
+            {% if users is defined and users %}
+            <hr>
+            <h6>Permissões por usuário</h6>
+            <p class="text-muted small">Marque quais permissões este usuário terá para o dispositivo.</p>
+            <div class="table-responsive mb-3">
+              <table class="table table-sm align-middle">
+                <thead>
+                  <tr>
+                    <th>Usuário</th>
+                    <th class="text-center">Ler</th>
+                    <th class="text-center">Escrever</th>
+                    <th class="text-center">Executar</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {% for u in users %}
+                  <tr>
+                    <td>{{ u.username }} <span class="text-muted">({{ u.email }})</span></td>
+                    <td class="text-center"><input type="checkbox" name="perm_{{ u.id }}_read" {% if device and u.id in device_permitted_users and device_permitted_users[u.id].can_read %}checked{% endif %}></td>
+                    <td class="text-center"><input type="checkbox" name="perm_{{ u.id }}_write" {% if device and u.id in device_permitted_users and device_permitted_users[u.id].can_write %}checked{% endif %}></td>
+                    <td class="text-center"><input type="checkbox" name="perm_{{ u.id }}_execute" {% if device and u.id in device_permitted_users and device_permitted_users[u.id].can_execute %}checked{% endif %}></td>
+                  </tr>
+                  {% endfor %}
+                </tbody>
+              </table>
+            </div>
+            {% else %}
+              <p class="text-muted small">Para atribuir permissões a usuários, acesse a página de permissões do usuário após criar o dispositivo.</p>
+            {% endif %}
+
+            <div class="d-flex justify-content-between">
+              <div>
+                <button type="submit" class="btn btn-primary">{% if device %}Salvar alterações{% else %}Criar dispositivo{% endif %}</button>
+                <a href="{{ url_for('devices.devices') }}" class="btn btn-outline-secondary ms-2">Cancelar</a>
+              </div>
+              {% if device %}
+                <form method="post" action="{{ url_for('devices.add_device') }}" onsubmit="return confirm('Tem certeza que deseja deletar este dispositivo? Esta ação não pode ser desfeita.')">
+                  <input type="hidden" name="delete_device_id" value="{{ device.id }}">
+                  <button type="submit" class="btn btn-danger">Deletar</button>
+                </form>
+              {% endif %}
+            </div>
+
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+{% endblock %}

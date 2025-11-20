@@ -13,6 +13,7 @@ from flask_login import login_required, current_user
 from werkzeug.security import generate_password_hash
 from extensions import db
 from models import User, UserRole, UserPermission, Device
+from werkzeug.security import check_password_hash
 
 # Criação do blueprint com url_prefix (todas as rotas começam com /admin)
 users_bp = Blueprint('users', __name__)
@@ -110,25 +111,149 @@ def toggle_user(user_id):
     return redirect(url_for('users.users'))
 
 
+# ========== ROTA: EDITAR USUÁRIO ==========
+
+@users_bp.route('/users/<int:user_id>/edit', methods=['GET', 'POST'])
+@login_required
+@admin_required
+def edit_user(user_id):
+    """
+    GET: Exibe formulário para editar usuário existente
+    POST: Atualiza os dados do usuário (username, email, senha, role)
+    """
+    user = User.query.get_or_404(user_id)
+
+    if request.method == 'POST':
+        username = request.form.get('username')
+        email = request.form.get('email')
+        password = request.form.get('password')
+        is_admin = True if request.form.get('is_admin') else False
+
+        # Verificações de unicidade (exceto ele mesmo)
+        other = User.query.filter(User.username == username, User.id != user.id).first()
+        if other:
+            flash('Nome de usuário já está em uso por outro usuário.', 'error')
+            return redirect(url_for('users.edit_user', user_id=user.id))
+
+        other_email = User.query.filter(User.email == email, User.id != user.id).first()
+        if other_email:
+            flash('Email já está em uso por outro usuário.', 'error')
+            return redirect(url_for('users.edit_user', user_id=user.id))
+
+        # Atualizar campos
+        user.username = username
+        user.email = email
+        user.role = UserRole.ADMIN if is_admin else UserRole.USER
+
+        # Atualizar senha somente se fornecida
+        if password:
+            user.password_hash = generate_password_hash(password)
+
+        try:
+            db.session.commit()
+            flash('Usuário atualizado com sucesso.', 'success')
+        except Exception:
+            db.session.rollback()
+            flash('Erro ao atualizar usuário.', 'error')
+
+        return redirect(url_for('users.users'))
+
+    # GET -> renderizar formulário com dados existentes
+    return render_template('add_user.html', user=user)
+
+
+# ========== ROTA: DELETAR USUÁRIO ==========
+
+@users_bp.route('/users/<int:user_id>/delete', methods=['POST'])
+@login_required
+@admin_required
+def delete_user(user_id):
+    """
+    Deleta um usuário. Requer confirmação no formulário cliente.
+    - Não permite que o admin delete a si mesmo
+    - Não permite remover o último administrador
+    """
+    user = User.query.get_or_404(user_id)
+
+    # Não permitir deletar a si mesmo
+    if user.id == current_user.id:
+        flash('Você não pode deletar seu próprio usuário.', 'error')
+        return redirect(url_for('users.users'))
+
+    # Se for admin, garantir que existam outros admins
+    if user.role == UserRole.ADMIN:
+        admin_count = User.query.filter_by(role=UserRole.ADMIN).count()
+        if admin_count <= 1:
+            flash('Não é possível deletar o último administrador.', 'error')
+            return redirect(url_for('users.users'))
+
+    try:
+        db.session.delete(user)
+        db.session.commit()
+        flash('Usuário deletado com sucesso.', 'success')
+    except Exception:
+        db.session.rollback()
+        flash('Erro ao deletar usuário.', 'error')
+
+    return redirect(url_for('users.users'))
+
+
 # ========== ROTA: GERENCIAR PERMISSÕES DO USUÁRIO ==========
 
-@users_bp.route('/users/<int:user_id>/permissions')
+@users_bp.route('/users/<int:user_id>/permissions', methods=['GET', 'POST'])
 @login_required
 @admin_required
 def user_permissions(user_id):
     """
-    Exibe e permite gerenciar as permissões de um usuário em relação aos dispositivos.
-    Mostra quais dispositivos o usuário tem acesso e quais permissões (read, write, execute).
+    GET: Exibe e permite gerenciar as permissões de um usuário em relação aos dispositivos.
+    POST: Atualiza as permissões (read/write/execute) conforme os checkboxes enviados.
     """
     # Buscar usuário
     user = User.query.get_or_404(user_id)
-    
+
     # Obter todos os dispositivos disponíveis
     devices = Device.query.all()
-    
-    # Obter permissões do usuário
-    user_permissions = UserPermission.query.filter_by(user_id=user_id).all()
-    
+
+    if request.method == 'POST':
+        # Processar cada dispositivo
+        try:
+            for d in devices:
+                    # Agora há apenas um checkbox por dispositivo: acesso permitido ou não
+                    allowed = bool(request.form.get(f'perm_{d.id}'))
+
+                    perm = UserPermission.query.filter_by(user_id=user.id, device_id=d.id).first()
+                    if allowed:
+                        # criar/atualizar permissão: definir can_read=True, demais False (modelo mantém campos)
+                        if perm:
+                            perm.can_read = True
+                            perm.can_write = False
+                            perm.can_execute = False
+                        else:
+                            perm = UserPermission(
+                                user_id=user.id,
+                                device_id=d.id,
+                                can_read=True,
+                                can_write=False,
+                                can_execute=False,
+                                granted_by=current_user.id
+                            )
+                            db.session.add(perm)
+                    else:
+                        # remover permissão se existir
+                        if perm:
+                            db.session.delete(perm)
+
+            db.session.commit()
+            flash('Permissões atualizadas com sucesso.', 'success')
+        except Exception:
+            db.session.rollback()
+            flash('Erro ao atualizar permissões.', 'error')
+
+        return redirect(url_for('users.user_permissions', user_id=user.id))
+
+    # GET: carregar permissões atuais
+    user_permissions = {p.device_id: p for p in UserPermission.query.filter_by(user_id=user_id).all()}
+
     return render_template('user_permissions.html', 
                          user=user, 
                          devices=devices, 

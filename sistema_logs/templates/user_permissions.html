@@ -1,0 +1,59 @@
+{% extends 'base.html' %}
+
+{#
+  Template para gerenciar permissões de um usuário sobre dispositivos.
+  Recebe:
+    - user: instância do User
+    - devices: lista de Device
+    - user_permissions: dict (device_id -> UserPermission) ou lista
+#}
+
+{% block content %}
+<div class="container mt-4">
+  <div class="row justify-content-center">
+    <div class="col-lg-10">
+      <div class="card shadow-sm">
+        <div class="card-header d-flex justify-content-between align-items-center">
+          <h5 class="mb-0">Permissões de Acesso — {{ user.username }}</h5>
+          <div>
+            <a href="{{ url_for('users.users') }}" class="btn btn-sm btn-outline-secondary">Voltar</a>
+          </div>
+        </div>
+        <div class="card-body">
+          <form method="post" action="{{ url_for('users.user_permissions', user_id=user.id) }}">
+            <p class="text-muted">Marque as permissões que este usuário terá para cada dispositivo.</p>
+
+            <div class="table-responsive">
+              <table class="table table-hover align-middle">
+                <thead class="table-light">
+                  <tr>
+                    <th>Dispositivo</th>
+                    <th>IP</th>
+                    <th>Tipo</th>
+                    <th class="text-center">Acesso</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {% for d in devices %}
+                  {% set perm = user_permissions[d.id] if user_permissions and d.id in user_permissions else None %}
+                  <tr>
+                    <td>{{ d.name }}</td>
+                    <td>{{ d.ip_address }}</td>
+                    <td>{{ d.device_type.name.capitalize() }}</td>
+                    <td class="text-center"><input type="checkbox" name="perm_{{ d.id }}" {% if perm %}checked{% endif %}></td>
+                  </tr>
+                  {% endfor %}
+                </tbody>
+              </table>
+            </div>
+
+            <div class="d-flex justify-content-end">
+              <button type="submit" class="btn btn-primary">Salvar Permissões</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

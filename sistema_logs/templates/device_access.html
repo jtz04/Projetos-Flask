@@ -1,0 +1,63 @@
+{% extends 'base.html' %}
+
+{#
+  Página exibida quando um usuário acessa um dispositivo com sucesso.
+  Recebe:
+    - device: instância do Device
+    - access_log: instância de AccessLog criada no momento do acesso
+#}
+
+{% block content %}
+<div class="container mt-4">
+  <div class="row justify-content-center">
+    <div class="col-md-10">
+      <div class="card shadow-sm">
+        <div class="card-header d-flex justify-content-between align-items-center">
+          <h5 class="mb-0">Acesso realizado com sucesso</h5>
+          <a href="{{ url_for('devices.devices') }}" class="btn btn-sm btn-outline-secondary">Voltar</a>
+        </div>
+        <div class="card-body">
+          <p class="lead">O acesso ao dispositivo foi registrado nos logs do sistema.</p>
+
+          <div class="row">
+            <div class="col-md-6">
+              <h6>Dispositivo</h6>
+              <ul class="list-unstyled">
+                <li><strong>Nome:</strong> {{ device.name }}</li>
+                <li><strong>Tipo:</strong> {{ device.device_type.name.capitalize() }}</li>
+                <li><strong>IP:</strong> {{ device.ip_address }}</li>
+                <li><strong>Localização:</strong> {{ device.location or '-' }}</li>
+              </ul>
+            </div>
+
+            <div class="col-md-6">
+              <h6>Informações do Acesso</h6>
+              {% if access_log %}
+              <ul class="list-unstyled">
+                <li><strong>Usuário:</strong> {{ access_log.user.username if access_log.user else current_user.username }}</li>
+                <li><strong>Ação:</strong> {{ access_log.action }}</li>
+                <li><strong>Resultado:</strong> {{ access_log.status }}</li>
+                <li><strong>Data / Hora:</strong> {{ access_log.access_time }}</li>
+                <li><strong>IP:</strong> {{ access_log.ip_address or request.remote_addr }}</li>
+                <li><strong>User-Agent:</strong> {{ access_log.user_agent or '—' }}</li>
+                <li><strong>Detalhes:</strong> {{ access_log.details or '—' }}</li>
+              </ul>
+              {% else %}
+                <p class="text-muted">Log de acesso não disponível.</p>
+              {% endif %}
+            </div>
+          </div>
+
+          <hr>
+
+          <div class="d-flex justify-content-between">
+            <a href="{{ url_for('logs.logs') }}" class="btn btn-outline-primary">Ver todos os logs</a>
+            <a href="{{ url_for('main.dashboard') }}" class="btn btn-primary">Ir para o dashboard</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+{% endblock %}

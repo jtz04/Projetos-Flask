@@ -21,19 +21,22 @@
                 <h5 class="mb-0"><i class="bi bi-person-plus"></i> Adicionar Novo Usuário</h5>
             </div>
             <div class="card-body">
-                <form method="POST" action="{{ url_for('users.add_user') }}">
+                <form method="POST" action="{% if user %}{{ url_for('users.edit_user', user_id=user.id) }}{% else %}{{ url_for('users.add_user') }}{% endif %}">
+                    {% if user %}
+                        <input type="hidden" name="user_id" value="{{ user.id }}">
+                    {% endif %}
                     <div class="row">
                         <div class="col-md-6">
                             <div class="mb-3">
                                 <label for="username" class="form-label">Nome de Usuário *</label>
-                                <input type="text" class="form-control" id="username" name="username" required>
+                                <input type="text" class="form-control" id="username" name="username" required value="{{ user.username if user else '' }}">
                                 <div class="form-text">Nome único para identificação no sistema.</div>
                             </div>
                         </div>
                         <div class="col-md-6">
                             <div class="mb-3">
                                 <label for="email" class="form-label">Email *</label>
-                                <input type="email" class="form-control" id="email" name="email" required>
+                                <input type="email" class="form-control" id="email" name="email" required value="{{ user.email if user else '' }}">
                             </div>
                         </div>
                     </div>
@@ -42,21 +45,21 @@
                         <div class="col-md-6">
                             <div class="mb-3">
                                 <label for="password" class="form-label">Senha *</label>
-                                <input type="password" class="form-control" id="password" name="password" required>
+                                <input type="password" class="form-control" id="password" name="password" {% if not user %}required{% endif %}>
                                 <div class="form-text">Mínimo 6 caracteres.</div>
                             </div>
                         </div>
                         <div class="col-md-6">
                             <div class="mb-3">
                                 <label for="confirm_password" class="form-label">Confirmar Senha *</label>
-                                <input type="password" class="form-control" id="confirm_password" name="confirm_password" required>
+                                <input type="password" class="form-control" id="confirm_password" name="confirm_password" {% if not user %}required{% endif %}>
                             </div>
                         </div>
                     </div>
 
                     <div class="mb-3">
-                        <div class="form-check form-switch">
-                            <input class="form-check-input" type="checkbox" id="is_admin" name="is_admin">
+                            <div class="form-check form-switch">
+                            <input class="form-check-input" type="checkbox" id="is_admin" name="is_admin" {% if user and user.role.value == 'admin' %}checked{% endif %}>
                             <label class="form-check-label" for="is_admin">
                                 <strong>Usuário Administrador</strong>
                             </label>
@@ -80,7 +83,7 @@
                             <i class="bi bi-arrow-left"></i> Cancelar
                         </a>
                         <button type="submit" class="btn btn-success">
-                            <i class="bi bi-person-check"></i> Criar Usuário
+                            <i class="bi bi-person-check"></i> {% if user %}Salvar Alterações{% else %}Criar Usuário{% endif %}
                         </button>
                     </div>
                 </form>
